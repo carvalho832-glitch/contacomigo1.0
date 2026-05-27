@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <meta name="theme-color" content="#ffffff" id="metaThemeColor">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ContaComigo">
+  <meta name="description" content="ContaComigo: seu app para sair do sufoco financeiro.">
+
+  <title>ContaComigo</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icon-192.png">
+  <link rel="stylesheet" href="style.css?v=1">
+
+  <script src="https://unpkg.com/lucide@latest" defer></script>
+  <script src="script.js?v=1" defer></script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <i data-lucide="piggy-bank"></i>
+        </div>
+
+        <div>
+          <p class="eyebrow">Seu app para sair do sufoco financeiro</p>
+          <h1>ContaComigo</h1>
+        </div>
+      </div>
+
+      <button class="icon-btn" id="btnOpenAccount" title="Minha conta">
+        <i data-lucide="user-round"></i>
+      </button>
+    </header>
+
+    <main>
+      <section class="screen active" id="screen-home">
+        <div class="hero-card">
+          <div>
+            <p class="hero-kicker">
+              <i data-lucide="sparkles"></i>
+              <span id="welcomeText">Olá, vamos cuidar do seu dinheiro?</span>
+            </p>
+            <h2>Vamos organizar seu mês?</h2>
+            <p id="mainInsight" class="hero-text">
+              Cadastre sua renda, contas e gastos para a Clara te ajudar.
+            </p>
+          </div>
+
+          <div class="status-pill" id="statusPill">
+            <i data-lucide="info"></i>
+            Configurando
+          </div>
+        </div>
+
+        <div class="grid-cards">
+          <article class="money-card">
+            <div class="card-icon income"><i data-lucide="wallet"></i></div>
+            <span>Renda mensal</span>
+            <strong id="incomeValue">R$ 0,00</strong>
+          </article>
+
+          <article class="money-card">
+            <div class="card-icon bills"><i data-lucide="receipt"></i></div>
+            <span>Contas fixas</span>
+            <strong id="billsValue">R$ 0,00</strong>
+          </article>
+
+          <article class="money-card">
+            <div class="card-icon debts"><i data-lucide="credit-card"></i></div>
+            <span>Dívidas do mês</span>
+            <strong id="debtsMonthlyValue">R$ 0,00</strong>
+          </article>
+
+          <article class="money-card">
+            <div class="card-icon expenses"><i data-lucide="trending-down"></i></div>
+            <span>Gastos do mês</span>
+            <strong id="expensesValue">R$ 0,00</strong>
+          </article>
+
+          <article class="money-card highlight wide-money">
+            <div class="card-icon daily"><i data-lucide="calendar"></i></div>
+            <span>Limite diário</span>
+            <strong id="dailyLimitValue">R$ 0,00</strong>
+          </article>
+        </div>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon"><i data-lucide="shield-check"></i></div>
+              <div>
+                <p class="muted">Saldo previsto</p>
+                <h3 id="availableValue">R$ 0,00</h3>
+              </div>
+            </div>
+
+            <span id="monthRiskBadge" class="badge neutral">
+              <i data-lucide="info"></i>
+              Organizando
+            </span>
+          </div>
+
+          <div class="progress-wrap">
+            <div class="progress-label">
+              <span>Comprometimento do mês</span>
+              <strong id="commitmentPercent">0%</strong>
+            </div>
+
+            <div class="progress">
+              <div id="commitmentBar"></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon"><i data-lucide="calendar-days"></i></div>
+              <div>
+                <p class="muted">Próximas contas</p>
+                <h3>Fique de olho</h3>
+              </div>
+            </div>
+          </div>
+
+          <div id="nextBillsList" class="list empty-list">
+            Nenhuma conta cadastrada ainda.
+          </div>
+        </article>
+
+        <article class="clara-card">
+          <div class="clara-avatar"><i data-lucide="bot"></i></div>
+          <div>
+            <h3>Clara Financeira</h3>
+            <p id="claraHomeText">
+              Eu vou te ajudar a enxergar seu dinheiro sem complicação.
+            </p>
+          </div>
+        </article>
+
+        <article class="debt-home-card">
+          <div class="debt-home-icon"><i data-lucide="credit-card"></i></div>
+          <div>
+            <p class="eyebrow">Controle de dívidas</p>
+            <h3>Minhas dívidas</h3>
+            <p>
+              Cadastre cartão, parcelas, empréstimos ou contas atrasadas para a Clara montar uma estratégia.
+            </p>
+
+            <button type="button" class="btn primary" id="btnOpenDebts">
+              <i data-lucide="list-plus"></i>
+              Ver minhas dívidas
+            </button>
+          </div>
+        </article>
+
+        <article class="sufoco-card">
+          <div class="sufoco-card-icon"><i data-lucide="life-buoy"></i></div>
+          <div>
+            <p class="eyebrow">Plano de emergência</p>
+            <h3>Sair do Sufoco</h3>
+            <p>
+              Veja um plano rápido para proteger suas contas, reduzir gastos e respirar melhor até o fim do mês.
+            </p>
+
+            <button type="button" class="btn danger-action" id="btnOpenSufoco">
+              <i data-lucide="shield-alert"></i>
+              Ver plano de emergência
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen" id="screen-setup">
+        <div class="section-title">
+          <p class="eyebrow">Primeiro passo</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="wallet"></i></div>
+            <h2>Minha renda</h2>
+          </div>
+        </div>
+
+        <form class="form-card" id="incomeForm">
+          <label>
+            Renda mensal
+            <input type="text" id="incomeInput" placeholder="Ex: 2500,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Dia que recebe
+            <input type="number" id="payDayInput" placeholder="Ex: 5" min="1" max="31">
+          </label>
+
+          <button type="submit" class="btn primary">
+            <i data-lucide="save"></i>
+            Salvar renda
+          </button>
+        </form>
+
+        <article class="tip-card">
+          <div class="tip-icon"><i data-lucide="lightbulb"></i></div>
+          <div>
+            <strong>Dica da Clara</strong>
+            <p>
+              Comece simples. Não precisa cadastrar tudo perfeito hoje.
+              Primeiro colocamos o dinheiro no mapa, depois ajustamos a rota.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen" id="screen-bills">
+        <div class="section-title">
+          <p class="eyebrow">Boletos, parcelas e compromissos</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="receipt"></i></div>
+            <h2>Minhas contas</h2>
+          </div>
+        </div>
+
+        <form class="form-card" id="billForm">
+          <label>
+            Nome da conta
+            <input type="text" id="billNameInput" placeholder="Ex: Internet, energia, cartão">
+          </label>
+
+          <label>
+            Valor
+            <input type="text" id="billValueInput" placeholder="Ex: 120,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Dia do vencimento
+            <input type="number" id="billDayInput" placeholder="Ex: 10" min="1" max="31">
+          </label>
+
+          <button type="submit" class="btn primary">
+            <i data-lucide="plus"></i>
+            Adicionar conta
+          </button>
+        </form>
+
+        <div id="billsList" class="list empty-list">
+          Nenhuma conta cadastrada.
+        </div>
+      </section>
+
+      <section class="screen" id="screen-expenses">
+        <div class="section-title">
+          <p class="eyebrow">Controle do mês</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="trending-down"></i></div>
+            <h2>Meus gastos</h2>
+          </div>
+        </div>
+
+        <form class="form-card" id="expenseForm">
+          <label>
+            Descrição
+            <input type="text" id="expenseNameInput" placeholder="Ex: Mercado, lanche, farmácia">
+          </label>
+
+          <label>
+            Valor
+            <input type="text" id="expenseValueInput" placeholder="Ex: 35,90" inputmode="decimal">
+          </label>
+
+          <label>
+            Categoria
+            <select id="expenseCategoryInput">
+              <option value="Alimentação">Alimentação</option>
+              <option value="Mercado">Mercado</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Saúde">Saúde</option>
+              <option value="Casa">Casa</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Cartão">Cartão</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </label>
+
+          <label>
+            Data
+            <input type="date" id="expenseDateInput">
+          </label>
+
+          <button type="submit" class="btn primary">
+            <i data-lucide="plus"></i>
+            Adicionar gasto
+          </button>
+        </form>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon"><i data-lucide="pie-chart"></i></div>
+              <div>
+                <p class="muted">Categorias</p>
+                <h3>Para onde foi o dinheiro</h3>
+              </div>
+            </div>
+          </div>
+
+          <div id="categoryBreakdown" class="category-list empty-list">
+            Nenhum gasto neste mês.
+          </div>
+        </article>
+
+        <div id="expensesList" class="list empty-list">
+          Nenhum gasto cadastrado.
+        </div>
+      </section>
+
+      <section class="screen" id="screen-buy">
+        <div class="section-title">
+          <p class="eyebrow">Compra consciente</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="shopping-cart"></i></div>
+            <h2>Posso comprar?</h2>
+          </div>
+        </div>
+
+        <form class="form-card" id="buyForm">
+          <label>
+            O que você quer comprar?
+            <input type="text" id="buyNameInput" placeholder="Ex: tênis, blusa, celular">
+          </label>
+
+          <label>
+            Valor total
+            <input type="text" id="buyValueInput" placeholder="Ex: 180,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Parcelas
+            <input type="number" id="buyInstallmentsInput" placeholder="1" min="1" value="1">
+          </label>
+
+          <label>
+            Tipo de compra
+            <select id="buyTypeInput">
+              <option value="nao-essencial">Não essencial</option>
+              <option value="essencial">Essencial</option>
+            </select>
+          </label>
+
+          <button type="submit" class="btn accent">
+            <i data-lucide="search-check"></i>
+            Analisar compra
+          </button>
+        </form>
+
+        <article class="result-card" id="buyResult">
+          <div class="result-icon"><i data-lucide="shopping-cart"></i></div>
+          <h3>Aguardando análise</h3>
+          <p>
+            Preencha os dados da compra para a Clara avaliar se ela cabe no seu mês.
+          </p>
+        </article>
+      </section>
+
+      <section class="screen" id="screen-clara">
+        <div class="section-title">
+          <p class="eyebrow">Assistente financeira</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="bot"></i></div>
+            <h2>Falar com a Clara</h2>
+          </div>
+        </div>
+
+        <article class="chat-card">
+          <div id="chatMessages" class="chat-messages">
+            <div class="message clara">
+              <strong>Clara</strong>
+              <p>
+                Oi! Eu sou a Clara. Por enquanto estou em modo local.
+                Me pergunte sobre gastos, compras, dívidas ou economia.
+              </p>
+            </div>
+          </div>
+
+          <form id="chatForm" class="chat-form">
+            <input type="text" id="chatInput" placeholder="Ex: como economizar esse mês?">
+
+            <button type="submit" class="btn primary send-btn">
+              <i data-lucide="send"></i>
+            </button>
+          </form>
+
+          <div class="quick-actions">
+            <button type="button" class="quick-btn" data-question="Como está meu mês?">
+              <i data-lucide="activity"></i>
+              Como está meu mês?
+            </button>
+
+            <button type="button" class="quick-btn" data-question="Como posso economizar?">
+              <i data-lucide="piggy-bank"></i>
+              Como economizar?
+            </button>
+
+            <button type="button" class="quick-btn" data-question="Estou no sufoco, o que faço?">
+              <i data-lucide="alert-triangle"></i>
+              Estou no sufoco
+            </button>
+
+            <button type="button" class="quick-btn" data-question="Como organizo minhas dívidas?">
+              <i data-lucide="credit-card"></i>
+              Dívidas
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <section class="screen" id="screen-debts">
+        <div class="section-title">
+          <p class="eyebrow">Cartão, parcelas e atrasos</p>
+          <div class="title-with-icon">
+            <div class="section-icon debt-section"><i data-lucide="credit-card"></i></div>
+            <h2>Minhas dívidas</h2>
+          </div>
+        </div>
+
+        <div class="debt-summary-grid">
+          <article class="debt-summary-card">
+            <div class="mini-icon"><i data-lucide="landmark"></i></div>
+            <span>Total em dívidas</span>
+            <strong id="debtTotalValue">R$ 0,00</strong>
+          </article>
+
+          <article class="debt-summary-card">
+            <div class="mini-icon"><i data-lucide="calendar-clock"></i></div>
+            <span>Parcelas do mês</span>
+            <strong id="debtInstallmentValue">R$ 0,00</strong>
+          </article>
+
+          <article class="debt-summary-card full">
+            <div class="mini-icon danger-mini"><i data-lucide="alert-triangle"></i></div>
+            <span>Dívidas atrasadas</span>
+            <strong id="debtLateValue">0</strong>
+          </article>
+        </div>
+
+        <article class="debt-strategy-card">
+          <div class="card-title-row">
+            <div class="mini-icon"><i data-lucide="route"></i></div>
+            <div>
+              <p class="muted">Estratégia da Clara</p>
+              <h3>Por onde começar</h3>
+            </div>
+          </div>
+
+          <p id="debtStrategyText">
+            Cadastre suas dívidas para eu sugerir uma ordem de prioridade.
+          </p>
+        </article>
+
+        <form class="form-card" id="debtForm">
+          <label>
+            Nome da dívida
+            <input type="text" id="debtNameInput" placeholder="Ex: Cartão Nubank, empréstimo, parcela da loja">
+          </label>
+
+          <label>
+            Valor total da dívida
+            <input type="text" id="debtTotalInput" placeholder="Ex: 1200,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Parcela mensal
+            <input type="text" id="debtInstallmentInput" placeholder="Ex: 180,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Dia do vencimento
+            <input type="number" id="debtDayInput" placeholder="Ex: 15" min="1" max="31">
+          </label>
+
+          <label>
+            Está atrasada?
+            <select id="debtLateInput">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </label>
+
+          <label>
+            Nível de juros
+            <select id="debtInterestInput">
+              <option value="nao-sei">Não sei</option>
+              <option value="baixo">Baixo</option>
+              <option value="medio">Médio</option>
+              <option value="alto">Alto</option>
+            </select>
+          </label>
+
+          <label>
+            Prioridade emocional
+            <select id="debtPriorityInput">
+              <option value="normal">Normal</option>
+              <option value="alta">Alta</option>
+            </select>
+          </label>
+
+          <button type="submit" class="btn primary">
+            <i data-lucide="plus"></i>
+            Adicionar dívida
+          </button>
+        </form>
+
+        <div id="debtsList" class="list empty-list">
+          Nenhuma dívida cadastrada.
+        </div>
+
+        <button type="button" class="btn primary full-btn" id="btnBackHomeFromDebts">
+          <i data-lucide="arrow-left"></i>
+          Voltar para o início
+        </button>
+      </section>
+
+      <section class="screen" id="screen-sufoco">
+        <div class="section-title">
+          <p class="eyebrow">Plano de emergência</p>
+          <div class="title-with-icon">
+            <div class="section-icon emergency"><i data-lucide="life-buoy"></i></div>
+            <h2>Sair do Sufoco</h2>
+          </div>
+        </div>
+
+        <article class="sufoco-hero">
+          <div>
+            <span id="sufocoModeBadge" class="badge neutral">
+              <i data-lucide="info"></i>
+              Analisando
+            </span>
+
+            <h3 id="sufocoMainTitle">Vamos analisar seu mês</h3>
+
+            <p id="sufocoMainText">
+              Cadastre sua renda, contas e gastos para receber um plano de emergência.
+            </p>
+          </div>
+
+          <button type="button" class="btn danger-action" id="btnActivateEconomy">
+            <i data-lucide="zap"></i>
+            Ativar modo economia
+          </button>
+        </article>
+
+        <div class="sufoco-grid">
+          <article class="sufoco-mini-card">
+            <div class="mini-icon"><i data-lucide="wallet"></i></div>
+            <span>Saldo previsto</span>
+            <strong id="sufocoAvailableValue">R$ 0,00</strong>
+          </article>
+
+          <article class="sufoco-mini-card">
+            <div class="mini-icon"><i data-lucide="calendar-clock"></i></div>
+            <span>Limite diário</span>
+            <strong id="sufocoDailyValue">R$ 0,00</strong>
+          </article>
+
+          <article class="sufoco-mini-card full">
+            <div class="mini-icon"><i data-lucide="activity"></i></div>
+            <span>Comprometimento</span>
+            <strong id="sufocoCommitmentValue">0%</strong>
+          </article>
+        </div>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon danger-mini"><i data-lucide="alarm-clock"></i></div>
+              <div>
+                <p class="muted">Prioridade agora</p>
+                <h3>Contas e dívidas urgentes</h3>
+              </div>
+            </div>
+          </div>
+
+          <div id="sufocoUrgentBills" class="list empty-list">
+            Nenhuma urgência encontrada.
+          </div>
+        </article>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon"><i data-lucide="clipboard-list"></i></div>
+              <div>
+                <p class="muted">Plano prático</p>
+                <h3>7 dias para respirar</h3>
+              </div>
+            </div>
+          </div>
+
+          <ol id="sufocoPlanList" class="action-list"></ol>
+        </article>
+
+        <article class="wide-card">
+          <div class="card-head">
+            <div class="card-title-row">
+              <div class="mini-icon"><i data-lucide="scissors"></i></div>
+              <div>
+                <p class="muted">Cortes inteligentes</p>
+                <h3>Onde ajustar primeiro</h3>
+              </div>
+            </div>
+          </div>
+
+          <div id="sufocoCutsList" class="cuts-list"></div>
+        </article>
+
+        <button type="button" class="btn primary full-btn" id="btnBackHomeFromSufoco">
+          <i data-lucide="arrow-left"></i>
+          Voltar para o início
+        </button>
+      </section>
+
+      <section class="screen" id="screen-account">
+        <div class="section-title">
+          <p class="eyebrow">Perfil e preferências</p>
+          <div class="title-with-icon">
+            <div class="section-icon"><i data-lucide="user-round-cog"></i></div>
+            <h2>Minha conta</h2>
+          </div>
+        </div>
+
+        <article class="account-hero">
+          <div class="account-avatar"><i data-lucide="user-round"></i></div>
+          <div>
+            <p class="muted">Bem-vindo ao ContaComigo</p>
+            <h3 id="accountDisplayName">Usuário</h3>
+            <span id="accountDisplayEmail">E-mail não cadastrado</span>
+          </div>
+        </article>
+
+        <form class="form-card" id="profileForm">
+          <label>
+            Nome
+            <input type="text" id="profileNameInput" placeholder="Ex: Julio">
+          </label>
+
+          <label>
+            E-mail
+            <input type="email" id="profileEmailInput" placeholder="Ex: seuemail@gmail.com">
+          </label>
+
+          <button type="submit" class="btn primary">
+            <i data-lucide="save"></i>
+            Salvar perfil
+          </button>
+        </form>
+
+        <article class="settings-card">
+          <div class="settings-row">
+            <div class="settings-info">
+              <div class="settings-icon"><i data-lucide="moon"></i></div>
+              <div>
+                <strong>Tema escuro</strong>
+                <p>Use uma aparência mais confortável para noite.</p>
+              </div>
+            </div>
+
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle">
+              <span></span>
+            </label>
+          </div>
+        </article>
+
+        <article class="settings-card">
+          <div class="settings-row">
+            <div class="settings-info">
+              <div class="settings-icon"><i data-lucide="bell-ring"></i></div>
+              <div>
+                <strong>Notificações</strong>
+                <p>Em breve: alertas de contas, gastos e revisão semanal.</p>
+              </div>
+            </div>
+
+            <span class="soon-badge">Em breve</span>
+          </div>
+        </article>
+
+        <article class="settings-card">
+          <div class="settings-row">
+            <div class="settings-info">
+              <div class="settings-icon danger-icon"><i data-lucide="trash-2"></i></div>
+              <div>
+                <strong>Limpar dados</strong>
+                <p>Apaga renda, contas, gastos e perfil salvos neste aparelho.</p>
+              </div>
+            </div>
+
+            <button type="button" class="small-danger-btn" id="btnClearData">
+              Apagar
+            </button>
+          </div>
+        </article>
+
+        <article class="version-card">
+          <div>
+            <strong>ContaComigo</strong>
+            <p>Versão PWA V1 · Clara local</p>
+          </div>
+
+          <i data-lucide="badge-check"></i>
+        </article>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-target="screen-home">
+        <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+        <small>Início</small>
+      </button>
+
+      <button class="nav-btn" data-target="screen-setup">
+        <span class="nav-icon"><i data-lucide="wallet"></i></span>
+        <small>Renda</small>
+      </button>
+
+      <button class="nav-btn" data-target="screen-bills">
+        <span class="nav-icon"><i data-lucide="receipt"></i></span>
+        <small>Contas</small>
+      </button>
+
+      <button class="nav-btn" data-target="screen-expenses">
+        <span class="nav-icon"><i data-lucide="trending-down"></i></span>
+        <small>Gastos</small>
+      </button>
+
+      <button class="nav-btn" data-target="screen-buy">
+        <span class="nav-icon"><i data-lucide="shopping-cart"></i></span>
+        <small>Comprar</small>
+      </button>
+
+      <button class="nav-btn" data-target="screen-clara">
+        <span class="nav-icon"><i data-lucide="bot"></i></span>
+        <small>Clara</small>
+      </button>
+    </nav>
+  </div>
+</body>
+</html>
