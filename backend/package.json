@@ -1,0 +1,20 @@
+{
+  "name": "contacomigo-clara-api",
+  "version": "1.0.0",
+  "description": "Backend da Clara IA para o app ContaComigo",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
