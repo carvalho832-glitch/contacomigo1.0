@@ -1,24 +1,33 @@
 :root {
   --primary: #0f3d5e;
   --primary-soft: #e6f2f7;
+
   --secondary: #14b8a6;
   --secondary-soft: #ddfbf6;
+
   --accent: #f59e0b;
   --accent-soft: #fff7df;
+
   --success: #22c55e;
   --success-soft: #dcfce7;
+
   --warning: #facc15;
   --warning-soft: #fef9c3;
+
   --danger: #ef4444;
   --danger-soft: #fee2e2;
+
   --background: #f6f8fa;
   --app-bg: #ffffff;
   --card: #ffffff;
+
   --text: #102a43;
   --muted: #64748b;
   --border: #e2e8f0;
+
   --input-bg: #fbfdff;
   --nav-bg: rgba(255, 255, 255, 0.92);
+
   --shadow: 0 16px 40px rgba(15, 61, 94, 0.12);
   --radius: 22px;
 }
@@ -26,24 +35,33 @@
 body.dark {
   --primary: #38bdf8;
   --primary-soft: #102f42;
+
   --secondary: #2dd4bf;
   --secondary-soft: #0f3b39;
+
   --accent: #f59e0b;
   --accent-soft: #39270a;
+
   --success: #22c55e;
   --success-soft: #12351f;
+
   --warning: #facc15;
   --warning-soft: #3b3208;
+
   --danger: #fb7185;
   --danger-soft: #421822;
+
   --background: #071822;
   --app-bg: #071822;
   --card: #0f2533;
+
   --text: #e5f3f7;
   --muted: #9fb5c1;
   --border: #1d3a4a;
+
   --input-bg: #0b1f2b;
   --nav-bg: rgba(15, 37, 51, 0.92);
+
   --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
 }
 
@@ -85,7 +103,7 @@ svg {
   background:
     radial-gradient(circle at top left, rgba(20, 184, 166, 0.16), transparent 32%),
     linear-gradient(180deg, var(--app-bg) 0%, var(--background) 42%);
-  padding: 18px 16px 100px;
+  padding: 18px 16px 135px;
 }
 
 .topbar {
@@ -854,6 +872,7 @@ body.dark .category-bar {
   padding: 12px 14px;
   border-radius: 18px;
   line-height: 1.45;
+  white-space: pre-line;
 }
 
 .message p {
@@ -911,8 +930,6 @@ body.dark .message.user {
   height: 16px;
   stroke-width: 2.5;
 }
-
-/* DÍVIDAS */
 
 .debt-home-card {
   display: flex;
@@ -1015,8 +1032,6 @@ body.dark .message.user {
   color: #991b1b;
   background: var(--danger-soft);
 }
-
-/* SAIR DO SUFOCO */
 
 .sufoco-card {
   display: flex;
@@ -1189,8 +1204,6 @@ body.dark .message.user {
   width: 100%;
 }
 
-/* CONTA */
-
 .account-hero {
   display: flex;
   align-items: center;
@@ -1347,75 +1360,177 @@ body.dark .message.user {
   color: var(--secondary);
 }
 
-/* MENU INFERIOR */
+/* DOCK INTELIGENTE RETRÁTIL */
 
-.bottom-nav {
+.smart-dock {
   position: fixed;
   left: 50%;
-  bottom: 12px;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 4px;
+  bottom: 14px;
+  z-index: 50;
   width: min(calc(100% - 24px), 520px);
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  background: var(--nav-bg);
-  box-shadow: 0 18px 50px rgba(15, 61, 94, 0.2);
-  backdrop-filter: blur(14px);
   transform: translateX(-50%);
+  pointer-events: none;
 }
 
-.nav-btn {
-  position: relative;
-  display: grid;
-  place-items: center;
-  gap: 3px;
-  min-height: 58px;
-  border: 0;
-  border-radius: 18px;
-  background: transparent;
-  color: var(--muted);
-  font-size: 0.68rem;
-  font-weight: 900;
+.dock-toggle,
+.dock-carousel {
+  pointer-events: auto;
 }
 
-.nav-btn small {
-  font-size: 0.68rem;
-  font-weight: 900;
-}
-
-.nav-icon {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-}
-
-.nav-icon svg {
-  width: 21px;
-  height: 21px;
-  stroke-width: 2.3;
-}
-
-.nav-btn.active {
-  background: linear-gradient(135deg, var(--primary-soft), var(--secondary-soft));
-  color: var(--primary);
-}
-
-.nav-btn.active::after {
-  content: "";
-  position: absolute;
-  top: 6px;
-  width: 22px;
-  height: 3px;
+.dock-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: min(270px, 100%);
+  min-height: 62px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: var(--secondary);
+  background: var(--nav-bg);
+  color: var(--text);
+  box-shadow: 0 18px 45px rgba(15, 61, 94, 0.22);
+  backdrop-filter: blur(16px);
 }
 
-.nav-btn.active .nav-icon {
+.dock-toggle-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--primary-soft), var(--secondary-soft));
   color: var(--secondary);
+}
+
+.dock-toggle-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.6;
+}
+
+.dock-toggle-text {
+  display: grid;
+  flex: 1;
+  text-align: left;
+  line-height: 1.1;
+}
+
+.dock-toggle-text strong {
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.dock-toggle-text small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.dock-arrow {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: var(--input-bg);
+  color: var(--primary);
+  transition: transform 0.22s ease;
+}
+
+.dock-arrow svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.6;
+}
+
+.smart-dock.open .dock-arrow {
+  transform: rotate(180deg);
+}
+
+.dock-carousel {
+  display: flex;
+  gap: 10px;
+  max-height: 0;
+  margin: 0;
+  padding: 0 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    max-height 0.24s ease,
+    opacity 0.2s ease,
+    transform 0.24s ease,
+    margin 0.24s ease,
+    padding 0.24s ease;
+  scrollbar-width: none;
+}
+
+.dock-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.smart-dock.open .dock-carousel {
+  max-height: 94px;
+  margin-bottom: 10px;
+  padding: 8px 4px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.smart-dock .nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 118px;
+  min-height: 56px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--nav-bg);
+  color: var(--muted);
+  box-shadow: 0 14px 35px rgba(15, 61, 94, 0.16);
+  backdrop-filter: blur(16px);
+  font-weight: 900;
+}
+
+.smart-dock .nav-btn small {
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.smart-dock .nav-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--input-bg);
+}
+
+.smart-dock .nav-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+}
+
+.smart-dock .nav-btn.active {
+  color: var(--primary);
+  border-color: rgba(20, 184, 166, 0.28);
+  background: linear-gradient(135deg, var(--primary-soft), var(--secondary-soft));
+}
+
+.smart-dock .nav-btn.active .nav-icon {
+  color: var(--secondary);
+  background: var(--card);
 }
 
 @media (display-mode: standalone) {
@@ -1427,6 +1542,7 @@ body.dark .message.user {
 @media (max-width: 390px) {
   .app-shell {
     padding-inline: 12px;
+    padding-bottom: 140px;
   }
 
   .grid-cards,
@@ -1439,10 +1555,6 @@ body.dark .message.user {
   .sufoco-mini-card.full,
   .debt-summary-card.full {
     grid-column: auto;
-  }
-
-  .bottom-nav {
-    grid-template-columns: repeat(3, 1fr);
   }
 
   .chat-form {
@@ -1460,5 +1572,13 @@ body.dark .message.user {
   .sufoco-card,
   .debt-home-card {
     align-items: flex-start;
+  }
+
+  .smart-dock .nav-btn {
+    min-width: 106px;
+  }
+
+  .dock-toggle {
+    width: min(250px, 100%);
   }
 }
