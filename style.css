@@ -1743,3 +1743,86 @@ body.menu-open {
     width: min(88vw, 340px);
   }
 }
+
+/* FATURAS INTELIGENTES V6 */
+
+.bill-detail {
+  display: grid;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.bill-detail span {
+  display: block;
+}
+
+.bill-rest {
+  color: var(--text) !important;
+  font-weight: 900;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.pay-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--success-soft);
+  color: #166534;
+  font-weight: 900;
+}
+
+.pay-btn svg {
+  width: 19px;
+  height: 19px;
+  stroke-width: 2.4;
+}
+
+body.dark .pay-btn {
+  color: #bbf7d0;
+}
+
+.due-chip.paid {
+  color: #166534;
+  background: var(--success-soft);
+}
+
+.due-chip.partial {
+  color: #854d0e;
+  background: var(--warning-soft);
+}
+
+.due-chip.open {
+  color: #991b1b;
+  background: var(--danger-soft);
+}
+
+body.dark .due-chip.open {
+  color: #fecdd3;
+}
+
+body.dark .due-chip.partial {
+  color: #fef08a;
+}
+
+body.dark .due-chip.paid {
+  color: #bbf7d0;
+}
+
+@media (max-width: 390px) {
+  .list-item {
+    align-items: flex-start;
+  }
+
+  .item-actions {
+    flex-direction: column;
+  }
+}

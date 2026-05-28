@@ -27,6 +27,21 @@ const currency = new Intl.NumberFormat("pt-BR", {
   currency: "BRL"
 });
 
+
+function normalizeBill(bill) {
+  const total = Number(bill.total ?? bill.value ?? 0) || 0;
+  const paid = Number(bill.paid ?? 0) || 0;
+
+  return {
+    ...bill,
+    id: bill.id || createId(),
+    total,
+    paid,
+    value: Math.max(total - paid, 0),
+    day: Number(bill.day) || ""
+  };
+}
+
 function normalizeState(data) {
   return {
     profile: {
@@ -37,7 +52,7 @@ function normalizeState(data) {
       ...defaultState.settings,
       ...(data.settings || {})
     },
-    bills: Array.isArray(data.bills) ? data.bills : [],
+    bills: Array.isArray(data.bills) ? data.bills.map(normalizeBill) : [],
     expenses: Array.isArray(data.expenses) ? data.expenses : [],
     debts: Array.isArray(data.debts) ? data.debts : []
   };
@@ -175,6 +190,66 @@ function getBillDueInfo(day) {
   };
 }
 
+function getBillRemaining(bill) {
+  const total = Number(bill.total ?? bill.value ?? 0) || 0;
+  const paid = Number(bill.paid ?? 0) || 0;
+
+  return Math.max(total - paid, 0);
+}
+
+function getBillPaymentInfo(bill) {
+  const total = Number(bill.total ?? bill.value ?? 0) || 0;
+  const paid = Number(bill.paid ?? 0) || 0;
+  const remaining = getBillRemaining(bill);
+
+  if (total <= 0) {
+    return {
+      label: "Sem valor",
+      type: "neutral",
+      icon: "info"
+    };
+  }
+
+  if (remaining <= 0 || paid >= total) {
+    return {
+      label: "Quitada",
+      type: "paid",
+      icon: "check-circle"
+    };
+  }
+
+  if (paid > 0 && paid < total) {
+    return {
+      label: "Parcial",
+      type: "partial",
+      icon: "circle-alert"
+    };
+  }
+
+  return {
+    label: "Em aberto",
+    type: "open",
+    icon: "alert-triangle"
+  };
+}
+
+function enrichBillForAI(bill) {
+  const total = Number(bill.total ?? bill.value ?? 0) || 0;
+  const paid = Number(bill.paid ?? 0) || 0;
+  const remaining = getBillRemaining(bill);
+  const payment = getBillPaymentInfo(bill);
+
+  return {
+    ...bill,
+    total,
+    paid,
+    remaining,
+    value: remaining,
+    paymentStatus: payment.label
+  };
+}
+
+
 function getStatusIcon(statusClass) {
   if (statusClass === "success") return "check-circle";
   if (statusClass === "warning") return "alert-triangle";
@@ -203,7 +278,7 @@ function getSummary() {
   const income = Number(state.profile.income) || 0;
 
   const billsTotal = state.bills.reduce((sum, bill) => {
-    return sum + Number(bill.value);
+    return sum + getBillRemaining(bill);
   }, 0);
 
   const debtsMonthlyTotal = getDebtMonthlyTotal();
@@ -357,9 +432,15 @@ function renderNextBills() {
   const bills = [...state.bills]
     .map((bill) => ({
       ...bill,
-      due: getBillDueInfo(bill.day)
+      due: getBillDueInfo(bill.day),
+      payment: getBillPaymentInfo(bill),
+      remaining: getBillRemaining(bill)
     }))
-    .sort((a, b) => a.due.order - b.due.order)
+    .sort((a, b) => {
+      if (a.remaining === 0 && b.remaining > 0) return 1;
+      if (a.remaining > 0 && b.remaining === 0) return -1;
+      return a.due.order - b.due.order;
+    })
     .slice(0, 5);
 
   container.className = "list";
@@ -372,11 +453,23 @@ function renderNextBills() {
 
         <div>
           <strong>${bill.name}</strong>
-          <span>${formatMoney(bill.value)} · dia ${bill.day}</span>
-          <em class="due-chip ${bill.due.type}">
-            <i data-lucide="${bill.due.icon}"></i>
-            ${bill.due.text}
+
+          <div class="bill-detail">
+            <span>Fatura ${formatMoney(bill.total)} · Pago ${formatMoney(bill.paid)}</span>
+            <span class="bill-rest">Resta ${formatMoney(bill.remaining)} · dia ${bill.day}</span>
+          </div>
+
+          <em class="due-chip ${bill.payment.type}">
+            <i data-lucide="${bill.payment.icon}"></i>
+            ${bill.payment.label}
           </em>
+
+          ${bill.remaining > 0 ? `
+            <em class="due-chip ${bill.due.type}">
+              <i data-lucide="${bill.due.icon}"></i>
+              ${bill.due.text}
+            </em>
+          ` : ""}
         </div>
       </div>
     </div>
@@ -396,6 +489,8 @@ function renderBillsList() {
 
   container.innerHTML = state.bills.map((bill) => {
     const due = getBillDueInfo(bill.day);
+    const payment = getBillPaymentInfo(bill);
+    const remaining = getBillRemaining(bill);
 
     return `
       <div class="list-item">
@@ -406,20 +501,60 @@ function renderBillsList() {
 
           <div>
             <strong>${bill.name}</strong>
-            <span>${formatMoney(bill.value)} · vence dia ${bill.day}</span>
-            <em class="due-chip ${due.type}">
-              <i data-lucide="${due.icon}"></i>
-              ${due.text}
+
+            <div class="bill-detail">
+              <span>Fatura ${formatMoney(bill.total)} · Pago ${formatMoney(bill.paid)}</span>
+              <span class="bill-rest">Resta ${formatMoney(remaining)} · vence dia ${bill.day}</span>
+            </div>
+
+            <em class="due-chip ${payment.type}">
+              <i data-lucide="${payment.icon}"></i>
+              ${payment.label}
             </em>
+
+            ${remaining > 0 ? `
+              <em class="due-chip ${due.type}">
+                <i data-lucide="${due.icon}"></i>
+                ${due.text}
+              </em>
+            ` : ""}
           </div>
         </div>
 
-        <button class="delete-btn" data-delete-bill="${bill.id}">
-          <i data-lucide="trash-2"></i>
-        </button>
+        <div class="item-actions">
+          <button class="pay-btn" data-pay-bill="${bill.id}" title="Atualizar valor pago">
+            <i data-lucide="wallet-cards"></i>
+          </button>
+
+          <button class="delete-btn" data-delete-bill="${bill.id}" title="Excluir conta">
+            <i data-lucide="trash-2"></i>
+          </button>
+        </div>
       </div>
     `;
   }).join("");
+
+  $$("[data-pay-bill]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.payBill;
+      const bill = state.bills.find((item) => item.id === id);
+
+      if (!bill) return;
+
+      const currentPaid = String(Number(bill.paid || 0).toFixed(2)).replace(".", ",");
+      const answer = prompt(`Quanto você já pagou de "${bill.name}"?`, currentPaid);
+
+      if (answer === null) return;
+
+      const paid = parseMoney(answer);
+
+      bill.paid = Math.max(0, paid);
+      bill.value = getBillRemaining(bill);
+
+      saveState();
+      renderDashboard();
+    });
+  });
 
   $$("[data-delete-bill]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -904,13 +1039,13 @@ function renderUrgentBillsAndDebts() {
     .map((bill) => ({
       id: bill.id,
       name: bill.name,
-      value: bill.value,
+      value: getBillRemaining(bill),
       day: bill.day,
-      typeLabel: "Conta",
+      typeLabel: getBillPaymentInfo(bill).label === "Parcial" ? "Conta parcial" : "Conta",
       icon: "receipt",
       due: getBillDueInfo(bill.day)
     }))
-    .filter((item) => item.due.order <= 5);
+    .filter((item) => item.value > 0 && item.due.order <= 5);
 
   const urgentDebts = state.debts
     .map((debt) => ({
@@ -1158,18 +1293,21 @@ function setupForms() {
     event.preventDefault();
 
     const name = $("#billNameInput").value.trim();
-    const value = parseMoney($("#billValueInput").value);
+    const total = parseMoney($("#billTotalInput").value);
+    const paid = parseMoney($("#billPaidInput").value);
     const day = Number($("#billDayInput").value);
 
-    if (!name || value <= 0 || day < 1 || day > 31) {
-      alert("Preencha nome, valor e dia de vencimento corretamente.");
+    if (!name || total <= 0 || day < 1 || day > 31) {
+      alert("Preencha nome, valor total da fatura e dia de vencimento corretamente.");
       return;
     }
 
     state.bills.push({
       id: createId(),
       name,
-      value,
+      total,
+      paid: Math.max(0, paid),
+      value: Math.max(total - paid, 0),
       day
     });
 
@@ -1388,7 +1526,7 @@ function buildClaraPayload(question) {
       commitment: summary.commitment,
       status: summary.status
     },
-    bills: state.bills,
+    bills: state.bills.map(enrichBillForAI),
     expenses: state.expenses,
     debts: state.debts
   };

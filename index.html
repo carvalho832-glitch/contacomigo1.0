@@ -15,10 +15,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 
   <script src="https://unpkg.com/lucide@latest" defer></script>
-  <script src="script.js?v=5" defer></script>
+  <script src="script.js?v=6" defer></script>
 </head>
 
 <body>
@@ -237,8 +237,13 @@
           </label>
 
           <label>
-            Valor
-            <input type="text" id="billValueInput" placeholder="Ex: 120,00" inputmode="decimal">
+            Valor total da fatura
+            <input type="text" id="billTotalInput" placeholder="Ex: 120,00" inputmode="decimal">
+          </label>
+
+          <label>
+            Valor pago
+            <input type="text" id="billPaidInput" placeholder="Ex: 0,00" inputmode="decimal">
           </label>
 
           <label>
@@ -713,7 +718,7 @@
         <article class="version-card">
           <div>
             <strong>ContaComigo</strong>
-            <p>Versão PWA V5 · Clara IA</p>
+            <p>Versão PWA V6 · Clara IA</p>
           </div>
 
           <i data-lucide="badge-check"></i>

@@ -45,3 +45,13 @@ Arquivos principais atualizados:
 ## V5
 
 Menu inferior removido e substituído por menu lateral retrátil.
+
+
+## V6 - Faturas Inteligentes
+
+- Valor total da fatura
+- Valor pago
+- Restante automático
+- Status automático: Em aberto, Parcial ou Quitada
+- Cálculo do mês considera apenas o restante
+- Backend da Clara IA atualizado para entender pagamentos parciais
