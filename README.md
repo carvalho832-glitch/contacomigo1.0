@@ -40,3 +40,8 @@ Arquivos principais atualizados:
 - `index.html`
 - `script.js`
 - `sw.js`
+
+
+## V5
+
+Menu inferior removido e substituído por menu lateral retrátil.

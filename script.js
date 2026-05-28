@@ -997,39 +997,26 @@ function formatDate(dateString) {
   return date.toLocaleDateString("pt-BR");
 }
 
-let ghostMenuTimer = null;
-
-function clearGhostMenuTimer() {
-  if (ghostMenuTimer) {
-    clearTimeout(ghostMenuTimer);
-    ghostMenuTimer = null;
-  }
-}
-
-function scheduleGhostMenuClose() {
-  clearGhostMenuTimer();
-
-  ghostMenuTimer = setTimeout(() => {
-    closeGhostMenu();
-  }, 4200);
-}
-
-function openGhostMenu() {
-  const menu = $("#ghostMenu");
+function openSideMenu() {
+  const menu = $("#sideMenu");
 
   if (!menu) return;
 
   menu.classList.add("open");
-  scheduleGhostMenuClose();
+  menu.setAttribute("aria-hidden", "false");
+  document.body.classList.add("menu-open");
+
+  renderIcons();
 }
 
-function closeGhostMenu() {
-  const menu = $("#ghostMenu");
+function closeSideMenu() {
+  const menu = $("#sideMenu");
 
   if (!menu) return;
 
   menu.classList.remove("open");
-  clearGhostMenuTimer();
+  menu.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("menu-open");
 }
 
 function showScreen(screenId) {
@@ -1037,11 +1024,11 @@ function showScreen(screenId) {
     screen.classList.toggle("active", screen.id === screenId);
   });
 
-  $$(".nav-btn").forEach((button) => {
+  $$(".nav-btn, .side-nav-btn").forEach((button) => {
     button.classList.toggle("active", button.dataset.target === screenId);
   });
 
-  closeGhostMenu();
+  closeSideMenu();
 
   window.scrollTo({
     top: 0,
@@ -1052,51 +1039,29 @@ function showScreen(screenId) {
 }
 
 function setupNavigation() {
-  const ghostMenu = $("#ghostMenu");
-  const ghostHotspot = $("#ghostHotspot");
-  const ghostPanel = $("#ghostMenuPanel");
+  const btnOpenMenu = $("#btnOpenMenu");
+  const btnCloseMenu = $("#btnCloseMenu");
+  const sideBackdrop = $("#sideBackdrop");
 
-  if (ghostHotspot) {
-    ghostHotspot.addEventListener("click", (event) => {
-      event.stopPropagation();
-      openGhostMenu();
-      renderIcons();
-    });
+  if (btnOpenMenu) {
+    btnOpenMenu.addEventListener("click", openSideMenu);
   }
 
-  if (ghostPanel) {
-    ghostPanel.addEventListener("pointerdown", () => {
-      scheduleGhostMenuClose();
-    });
-
-    ghostPanel.addEventListener("scroll", () => {
-      scheduleGhostMenuClose();
-    });
+  if (btnCloseMenu) {
+    btnCloseMenu.addEventListener("click", closeSideMenu);
   }
 
-  document.addEventListener("click", (event) => {
-    const target = event.target;
+  if (sideBackdrop) {
+    sideBackdrop.addEventListener("click", closeSideMenu);
+  }
 
-    if (!ghostMenu) return;
-
-    if (target.closest("#ghostMenu")) return;
-
-    const isInteractive = target.closest(
-      "button, input, select, textarea, a, label"
-    );
-
-    if (isInteractive) return;
-
-    if (ghostMenu.classList.contains("open")) {
-      closeGhostMenu();
-      return;
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeSideMenu();
     }
-
-    openGhostMenu();
-    renderIcons();
   });
 
-  $$(".nav-btn").forEach((button) => {
+  $$(".nav-btn, .side-nav-btn").forEach((button) => {
     button.addEventListener("click", () => {
       showScreen(button.dataset.target);
     });
@@ -1121,6 +1086,21 @@ function setupNavigation() {
   $("#btnBackHomeFromDebts").addEventListener("click", () => {
     showScreen("screen-home");
   });
+
+  const btnMenuDebts = $("#btnMenuDebts");
+  const btnMenuSufoco = $("#btnMenuSufoco");
+
+  if (btnMenuDebts) {
+    btnMenuDebts.addEventListener("click", () => {
+      showScreen("screen-debts");
+    });
+  }
+
+  if (btnMenuSufoco) {
+    btnMenuSufoco.addEventListener("click", () => {
+      showScreen("screen-sufoco");
+    });
+  }
 }
 
 function setupForms() {

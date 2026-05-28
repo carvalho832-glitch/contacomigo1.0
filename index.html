@@ -15,15 +15,19 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 
   <script src="https://unpkg.com/lucide@latest" defer></script>
-  <script src="script.js?v=4" defer></script>
+  <script src="script.js?v=5" defer></script>
 </head>
 
 <body>
   <div class="app-shell">
     <header class="topbar">
+      <button class="menu-btn" id="btnOpenMenu" type="button" title="Abrir menu">
+        <i data-lucide="menu"></i>
+      </button>
+
       <div class="brand">
         <div class="brand-mark">
           <i data-lucide="piggy-bank"></i>
@@ -709,50 +713,79 @@
         <article class="version-card">
           <div>
             <strong>ContaComigo</strong>
-            <p>Versão PWA V4 · Clara IA</p>
+            <p>Versão PWA V5 · Clara IA</p>
           </div>
 
           <i data-lucide="badge-check"></i>
         </article>
       </section>
     </main>
-    <nav class="ghost-menu" id="ghostMenu" aria-label="Menu principal">
-      <div class="ghost-menu-panel" id="ghostMenuPanel">
-        <button class="nav-btn active" data-target="screen-home" data-label="Início">
-          <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
-          <small>Início</small>
-        </button>
+    <aside class="side-menu" id="sideMenu" aria-hidden="true">
+      <div class="side-backdrop" id="sideBackdrop"></div>
 
-        <button class="nav-btn" data-target="screen-setup" data-label="Renda">
-          <span class="nav-icon"><i data-lucide="wallet"></i></span>
-          <small>Renda</small>
-        </button>
+      <div class="side-panel" role="dialog" aria-label="Menu principal">
+        <div class="side-header">
+          <div class="side-brand">
+            <div class="side-logo">
+              <i data-lucide="piggy-bank"></i>
+            </div>
 
-        <button class="nav-btn" data-target="screen-bills" data-label="Contas">
-          <span class="nav-icon"><i data-lucide="receipt"></i></span>
-          <small>Contas</small>
-        </button>
+            <div>
+              <strong>ContaComigo</strong>
+              <span>Menu principal</span>
+            </div>
+          </div>
 
-        <button class="nav-btn" data-target="screen-expenses" data-label="Gastos">
-          <span class="nav-icon"><i data-lucide="trending-down"></i></span>
-          <small>Gastos</small>
-        </button>
+          <button class="side-close" id="btnCloseMenu" type="button" title="Fechar menu">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
 
-        <button class="nav-btn" data-target="screen-buy" data-label="Comprar">
-          <span class="nav-icon"><i data-lucide="shopping-cart"></i></span>
-          <small>Comprar</small>
-        </button>
+        <nav class="side-nav">
+          <button class="side-nav-btn active" data-target="screen-home">
+            <span><i data-lucide="layout-dashboard"></i></span>
+            Início
+          </button>
 
-        <button class="nav-btn" data-target="screen-clara" data-label="Clara">
-          <span class="nav-icon"><i data-lucide="bot"></i></span>
-          <small>Clara</small>
-        </button>
+          <button class="side-nav-btn" data-target="screen-setup">
+            <span><i data-lucide="wallet"></i></span>
+            Renda
+          </button>
+
+          <button class="side-nav-btn" data-target="screen-bills">
+            <span><i data-lucide="receipt"></i></span>
+            Contas
+          </button>
+
+          <button class="side-nav-btn" data-target="screen-expenses">
+            <span><i data-lucide="trending-down"></i></span>
+            Gastos
+          </button>
+
+          <button class="side-nav-btn" data-target="screen-buy">
+            <span><i data-lucide="shopping-cart"></i></span>
+            Comprar
+          </button>
+
+          <button class="side-nav-btn" data-target="screen-clara">
+            <span><i data-lucide="bot"></i></span>
+            Clara
+          </button>
+        </nav>
+
+        <div class="side-footer">
+          <button class="side-extra-btn" id="btnMenuDebts" type="button">
+            <i data-lucide="credit-card"></i>
+            Minhas dívidas
+          </button>
+
+          <button class="side-extra-btn danger" id="btnMenuSufoco" type="button">
+            <i data-lucide="life-buoy"></i>
+            Sair do Sufoco
+          </button>
+        </div>
       </div>
-
-      <button class="ghost-hotspot" id="ghostHotspot" type="button" aria-label="Abrir menu">
-        <span><i data-lucide="chevron-up"></i></span>
-      </button>
-    </nav>
+    </aside>
   </div>
 </body>
 </html>
