@@ -27,18 +27,6 @@ const currency = new Intl.NumberFormat("pt-BR", {
   currency: "BRL"
 });
 
-const screenLabels = {
-  "screen-home": "Início",
-  "screen-setup": "Renda",
-  "screen-bills": "Contas",
-  "screen-expenses": "Gastos",
-  "screen-buy": "Comprar",
-  "screen-clara": "Clara",
-  "screen-debts": "Dívidas",
-  "screen-sufoco": "Sair do Sufoco",
-  "screen-account": "Minha conta"
-};
-
 function normalizeState(data) {
   return {
     profile: {
@@ -586,7 +574,6 @@ function getDebtRiskScore(debt) {
   if (debt.priority === "alta") score += 2;
 
   const due = getBillDueInfo(debt.day);
-
   if (due.order <= 3) score += 1;
 
   return score;
@@ -1010,22 +997,39 @@ function formatDate(dateString) {
   return date.toLocaleDateString("pt-BR");
 }
 
-function updateDockCurrentLabel(screenId) {
-  const label = $("#currentScreenLabel");
+let ghostMenuTimer = null;
 
-  if (!label) return;
-
-  label.textContent = screenLabels[screenId] || "ContaComigo";
+function clearGhostMenuTimer() {
+  if (ghostMenuTimer) {
+    clearTimeout(ghostMenuTimer);
+    ghostMenuTimer = null;
+  }
 }
 
-function closeSmartDock() {
-  const dock = $("#smartDock");
-  const toggle = $("#dockToggle");
+function scheduleGhostMenuClose() {
+  clearGhostMenuTimer();
 
-  if (!dock || !toggle) return;
+  ghostMenuTimer = setTimeout(() => {
+    closeGhostMenu();
+  }, 4200);
+}
 
-  dock.classList.remove("open");
-  toggle.setAttribute("aria-expanded", "false");
+function openGhostMenu() {
+  const menu = $("#ghostMenu");
+
+  if (!menu) return;
+
+  menu.classList.add("open");
+  scheduleGhostMenuClose();
+}
+
+function closeGhostMenu() {
+  const menu = $("#ghostMenu");
+
+  if (!menu) return;
+
+  menu.classList.remove("open");
+  clearGhostMenuTimer();
 }
 
 function showScreen(screenId) {
@@ -1037,8 +1041,7 @@ function showScreen(screenId) {
     button.classList.toggle("active", button.dataset.target === screenId);
   });
 
-  updateDockCurrentLabel(screenId);
-  closeSmartDock();
+  closeGhostMenu();
 
   window.scrollTo({
     top: 0,
@@ -1049,17 +1052,49 @@ function showScreen(screenId) {
 }
 
 function setupNavigation() {
-  const dock = $("#smartDock");
-  const dockToggle = $("#dockToggle");
+  const ghostMenu = $("#ghostMenu");
+  const ghostHotspot = $("#ghostHotspot");
+  const ghostPanel = $("#ghostMenuPanel");
 
-  if (dock && dockToggle) {
-    dockToggle.addEventListener("click", () => {
-      const isOpen = dock.classList.toggle("open");
-
-      dockToggle.setAttribute("aria-expanded", String(isOpen));
+  if (ghostHotspot) {
+    ghostHotspot.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openGhostMenu();
       renderIcons();
     });
   }
+
+  if (ghostPanel) {
+    ghostPanel.addEventListener("pointerdown", () => {
+      scheduleGhostMenuClose();
+    });
+
+    ghostPanel.addEventListener("scroll", () => {
+      scheduleGhostMenuClose();
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+
+    if (!ghostMenu) return;
+
+    if (target.closest("#ghostMenu")) return;
+
+    const isInteractive = target.closest(
+      "button, input, select, textarea, a, label"
+    );
+
+    if (isInteractive) return;
+
+    if (ghostMenu.classList.contains("open")) {
+      closeGhostMenu();
+      return;
+    }
+
+    openGhostMenu();
+    renderIcons();
+  });
 
   $$(".nav-btn").forEach((button) => {
     button.addEventListener("click", () => {
@@ -1351,6 +1386,7 @@ function analyzePurchase() {
   renderIcons();
 }
 
+
 function buildClaraPayload(question) {
   const summary = getSummary();
 
@@ -1422,6 +1458,7 @@ async function handleClaraQuestion(question) {
 
   renderIcons();
 }
+
 
 function addMessage(type, author, text) {
   const container = $("#chatMessages");
@@ -1530,7 +1567,6 @@ function init() {
   setupNavigation();
   setupForms();
   hydrateInputs();
-  updateDockCurrentLabel("screen-home");
   renderDashboard();
   renderIcons();
   registerServiceWorker();
