@@ -25,3 +25,18 @@ App PWA financeiro para ajudar pessoas a sair do sufoco financeiro.
 ## Observação
 
 A Clara está em modo local nesta versão. A próxima fase será conectar backend no Render e IA.
+
+
+## Clara IA
+
+Esta versão aponta o chat da Clara para:
+
+```txt
+https://contacomigo1-0.onrender.com/api/clara
+```
+
+Arquivos principais atualizados:
+
+- `index.html`
+- `script.js`
+- `sw.js`

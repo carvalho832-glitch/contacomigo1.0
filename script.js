@@ -1,4 +1,5 @@
 const STORAGE_KEY = "contacomigo_pwa_v1";
+const CLARA_API_URL = "https://contacomigo1-0.onrender.com/api/clara";
 
 const defaultState = {
   profile: {
@@ -1187,7 +1188,7 @@ function setupForms() {
     analyzePurchase();
   });
 
-  $("#chatForm").addEventListener("submit", (event) => {
+  $("#chatForm").addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const input = $("#chatInput");
@@ -1195,21 +1196,15 @@ function setupForms() {
 
     if (!question) return;
 
-    addMessage("user", "Você", question);
-    addMessage("clara", "Clara", claraLocalAnswer(question));
-
     input.value = "";
-    renderIcons();
+    await handleClaraQuestion(question);
   });
 
   $$(".quick-btn").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const question = button.dataset.question;
 
-      addMessage("user", "Você", question);
-      addMessage("clara", "Clara", claraLocalAnswer(question));
-
-      renderIcons();
+      await handleClaraQuestion(question);
     });
   });
 
@@ -1310,6 +1305,80 @@ function analyzePurchase() {
   renderIcons();
 }
 
+
+function buildClaraPayload(question) {
+  const summary = getSummary();
+
+  return {
+    question,
+    profile: {
+      name: state.profile.name,
+      email: state.profile.email,
+      income: state.profile.income,
+      payDay: state.profile.payDay
+    },
+    summary: {
+      income: summary.income,
+      billsTotal: summary.billsTotal,
+      debtsMonthlyTotal: summary.debtsMonthlyTotal,
+      expensesTotal: summary.expensesTotal,
+      available: summary.available,
+      dailyLimit: summary.dailyLimit,
+      commitment: summary.commitment,
+      status: summary.status
+    },
+    bills: state.bills,
+    expenses: state.expenses,
+    debts: state.debts
+  };
+}
+
+async function askClaraAI(question) {
+  try {
+    const response = await fetch(CLARA_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(buildClaraPayload(question))
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok || !data?.ok) {
+      throw new Error(data?.error || "Falha ao consultar a Clara IA.");
+    }
+
+    return data.answer || "Não consegui gerar uma resposta agora. Tente novamente.";
+  } catch (error) {
+    console.warn("Clara IA indisponível, usando modo local:", error);
+
+    return `${claraLocalAnswer(question)}\n\nObs.: não consegui conectar com a Clara IA agora, então respondi em modo local.`;
+  }
+}
+
+async function handleClaraQuestion(question) {
+  addMessage("user", "Você", question);
+
+  const loadingMessage = addMessage(
+    "clara",
+    "Clara",
+    "Estou analisando seu mês com a IA... só um instantinho."
+  );
+
+  renderIcons();
+
+  const answer = await askClaraAI(question);
+
+  loadingMessage.querySelector("p").textContent = answer;
+
+  const container = $("#chatMessages");
+  container.scrollTop = container.scrollHeight;
+
+  renderIcons();
+}
+
+
 function addMessage(type, author, text) {
   const container = $("#chatMessages");
   const message = document.createElement("div");
@@ -1322,6 +1391,8 @@ function addMessage(type, author, text) {
 
   container.appendChild(message);
   container.scrollTop = container.scrollHeight;
+
+  return message;
 }
 
 function claraLocalAnswer(question) {
