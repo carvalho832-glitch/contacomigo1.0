@@ -1,10 +1,12 @@
-const CACHE_NAME = "contacomigo-pwa-v6";
+const CACHE_NAME = "contacomigo-pwa-v7";
 
 const CORE_ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./script.js",
+  "./firebase-cloud.js",
+  "./firebase-config.js",
   "./manifest.json",
   "./assets/icon.svg",
   "./assets/icon-192.png",
