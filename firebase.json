@@ -1,5 +1,17 @@
 {
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "auth": {
+    "providers": {
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "ContaComigo",
+        "supportEmail": "carvalho832@gmail.com",
+        "authorizedRedirectUris": [
+          "https://contacomigo-app-832.firebaseapp.com/__/auth/handler",
+          "https://contacomigo-app-832.web.app/__/auth/handler"
+        ]
+      }
+    }
   }
 }
