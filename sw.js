@@ -1,4 +1,4 @@
-const CACHE_NAME = "contacomigo-pwa-v7";
+const CACHE_NAME = "contacomigo-pwa-v7-r1";
 
 const CORE_ASSETS = [
   "./",
