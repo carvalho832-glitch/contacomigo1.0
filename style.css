@@ -1887,3 +1887,9 @@ body.dark .due-chip.paid {
     flex-direction: column;
   }
 }
+
+
+/* Respect HTML hidden state even when component styles set display. */
+[hidden] {
+  display: none !important;
+}
