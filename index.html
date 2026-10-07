@@ -15,10 +15,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/icon-192.png">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 
   <script src="https://unpkg.com/lucide@latest" defer></script>
-  <script src="script.js?v=6" defer></script>
+  <script src="script.js?v=7" defer></script>
 </head>
 
 <body>
@@ -668,6 +668,31 @@
           </button>
         </form>
 
+        <article class="settings-card cloud-sync-card">
+          <div class="settings-row">
+            <div class="settings-info">
+              <div class="settings-icon"><i data-lucide="cloud"></i></div>
+              <div>
+                <strong>Nuvem do ContaComigo</strong>
+                <p id="cloudStatusText">Seus dados continuam salvos neste aparelho até a nuvem ser conectada.</p>
+              </div>
+            </div>
+
+            <span class="cloud-status-badge" id="cloudStatusBadge">Local</span>
+          </div>
+
+          <div class="cloud-actions">
+            <button type="button" class="btn primary cloud-btn" id="btnCloudConnect">
+              <i data-lucide="cloud-upload"></i>
+              Conectar com Google
+            </button>
+
+            <button type="button" class="cloud-disconnect-btn" id="btnCloudDisconnect" hidden>
+              Desconectar da nuvem
+            </button>
+          </div>
+        </article>
+
         <article class="settings-card">
           <div class="settings-row">
             <div class="settings-info">
@@ -705,7 +730,7 @@
               <div class="settings-icon danger-icon"><i data-lucide="trash-2"></i></div>
               <div>
                 <strong>Limpar dados</strong>
-                <p>Apaga renda, contas, gastos e perfil salvos neste aparelho.</p>
+                <p>Apaga renda, contas, gastos e perfil deste aparelho e da nuvem conectada.</p>
               </div>
             </div>
 
@@ -718,7 +743,7 @@
         <article class="version-card">
           <div>
             <strong>ContaComigo</strong>
-            <p>Versão PWA V6 · Clara IA</p>
+            <p>Versão PWA V7 · Clara IA</p>
           </div>
 
           <i data-lucide="badge-check"></i>

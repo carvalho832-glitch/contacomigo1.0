@@ -1,6 +1,8 @@
 const STORAGE_KEY = "contacomigo_pwa_v1";
 const CLARA_API_URL = "https://contacomigo1-0.onrender.com/api/clara";
 
+let cloudApi = null;
+
 const defaultState = {
   profile: {
     name: "",
@@ -81,8 +83,12 @@ function loadState() {
   }
 }
 
-function saveState() {
+function saveState(options = {}) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+  if (!options.skipCloud && cloudApi?.queueCloudSave) {
+    cloudApi.queueCloudSave(state);
+  }
 }
 
 function applyTheme() {
@@ -1407,14 +1413,30 @@ function setupForms() {
     });
   });
 
-  $("#btnClearData").addEventListener("click", () => {
-    const confirmClear = confirm("Deseja apagar todos os dados do ContaComigo?");
+  $("#btnClearData").addEventListener("click", async () => {
+    const cloudConnected = Boolean(cloudApi?.isCloudConnected?.());
+    const message = cloudConnected
+      ? "Deseja apagar todos os dados do ContaComigo deste aparelho e também da nuvem?"
+      : "Deseja apagar todos os dados do ContaComigo deste aparelho?";
+
+    const confirmClear = confirm(message);
 
     if (!confirmClear) return;
 
+    if (cloudConnected) {
+      try {
+        await cloudApi.deleteCloudData();
+      } catch (error) {
+        console.error("Falha ao apagar dados da nuvem:", error);
+        alert("Não consegui apagar os dados da nuvem. Por segurança, os dados locais não foram apagados.");
+        return;
+      }
+    }
+
     state = structuredClone(defaultState);
 
-    saveState();
+    saveState({ skipCloud: true });
+    hydrateInputs();
     applyTheme();
     renderDashboard();
     showScreen("screen-home");
@@ -1667,6 +1689,103 @@ function hydrateInputs() {
   $("#profileEmailInput").value = state.profile.email || "";
 }
 
+function renderCloudStatus(status = {}) {
+  const badge = $("#cloudStatusBadge");
+  const text = $("#cloudStatusText");
+  const connectButton = $("#btnCloudConnect");
+  const disconnectButton = $("#btnCloudDisconnect");
+
+  if (!badge || !text || !connectButton || !disconnectButton) return;
+
+  badge.className = "cloud-status-badge";
+  connectButton.hidden = false;
+  disconnectButton.hidden = true;
+  connectButton.disabled = false;
+
+  if (status.state === "not-configured") {
+    badge.textContent = "Pendente";
+    text.textContent = "A estrutura da nuvem está pronta. Falta vincular este app ao projeto Firebase.";
+    connectButton.disabled = true;
+    return;
+  }
+
+  if (status.state === "connecting" || status.state === "syncing") {
+    badge.classList.add("syncing");
+    badge.textContent = "Sincronizando";
+    text.textContent = "Conectando com segurança e conferindo seus dados...";
+    connectButton.disabled = true;
+    return;
+  }
+
+  if (status.state === "synced" || status.state === "signed-in-empty") {
+    badge.classList.add("synced");
+    badge.textContent = "Na nuvem";
+    text.textContent = status.email
+      ? `Dados sincronizados com ${status.email}.`
+      : "Dados sincronizados com o Firebase.";
+    connectButton.hidden = true;
+    disconnectButton.hidden = false;
+    return;
+  }
+
+  if (status.state === "error") {
+    badge.classList.add("error");
+    badge.textContent = "Erro";
+    text.textContent = status.message || "A nuvem está temporariamente indisponível. Seus dados locais continuam seguros.";
+    return;
+  }
+
+  badge.textContent = "Local";
+  text.textContent = "Seus dados estão neste aparelho. Conecte sua conta Google para ativar a nuvem.";
+}
+
+async function setupCloudSync() {
+  try {
+    cloudApi = await import("./firebase-cloud.js");
+
+    const connectButton = $("#btnCloudConnect");
+    const disconnectButton = $("#btnCloudDisconnect");
+
+    connectButton?.addEventListener("click", async () => {
+      try {
+        await cloudApi.connectWithGoogle();
+      } catch (error) {
+        console.error("Falha ao conectar Firebase:", error);
+        renderCloudStatus({
+          state: "error",
+          message: "Não consegui concluir o login com Google. Tente novamente."
+        });
+      }
+    });
+
+    disconnectButton?.addEventListener("click", async () => {
+      try {
+        await cloudApi.disconnectCloud();
+      } catch (error) {
+        console.error("Falha ao desconectar Firebase:", error);
+      }
+    });
+
+    await cloudApi.initCloudSync({
+      getLocalState: () => state,
+      onRemoteState: (remoteState) => {
+        state = normalizeState(remoteState || defaultState);
+        saveState({ skipCloud: true });
+        hydrateInputs();
+        applyTheme();
+        renderDashboard();
+      },
+      onStatus: renderCloudStatus
+    });
+  } catch (error) {
+    console.error("Falha ao carregar integração Firebase:", error);
+    renderCloudStatus({
+      state: "error",
+      message: "A integração com a nuvem não pôde ser carregada. Seus dados locais continuam disponíveis."
+    });
+  }
+}
+
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator)) return;
 
@@ -1687,6 +1806,7 @@ function init() {
   hydrateInputs();
   renderDashboard();
   renderIcons();
+  setupCloudSync();
   registerServiceWorker();
 }
 
