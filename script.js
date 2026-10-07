@@ -1741,7 +1741,7 @@ function renderCloudStatus(status = {}) {
 
 async function setupCloudSync() {
   try {
-    cloudApi = await import("./firebase-cloud.js");
+    cloudApi = await import("./firebase-cloud.js?v=7.1");
 
     const connectButton = $("#btnCloudConnect");
     const disconnectButton = $("#btnCloudDisconnect");
@@ -1751,9 +1751,22 @@ async function setupCloudSync() {
         await cloudApi.connectWithGoogle();
       } catch (error) {
         console.error("Falha ao conectar Firebase:", error);
+
+        const code = error?.code || "auth/erro-desconhecido";
+        const authMessages = {
+          "auth/popup-blocked": "O navegador bloqueou a janela de login.",
+          "auth/popup-closed-by-user": "A janela do Google foi fechada antes de concluir o login.",
+          "auth/cancelled-popup-request": "O navegador cancelou a janela de login anterior.",
+          "auth/unauthorized-domain": "Este endereço do ContaComigo ainda não está autorizado no Firebase.",
+          "auth/operation-not-allowed": "O login Google ainda não está habilitado no Firebase.",
+          "auth/network-request-failed": "Falha de rede ao falar com o Google.",
+          "auth/web-storage-unsupported": "O navegador está bloqueando o armazenamento necessário para o login."
+        };
+
+        const detail = authMessages[code] || error?.message || "Não consegui concluir o login com Google.";
         renderCloudStatus({
           state: "error",
-          message: "Não consegui concluir o login com Google. Tente novamente."
+          message: `${detail} [${code}]`
         });
       }
     });
